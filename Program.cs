@@ -1,4 +1,5 @@
 ﻿using Ships.Entities.Ships;
+using Ships.Entities.Squadrons;
 
 namespace Ships
 {
@@ -22,30 +23,30 @@ namespace Ships
                 userChoise = Console.ReadLine()?.Trim();
 
                 if (userChoise == "1" || userChoise == "2") break;
-                Console.Write("  Неверный ввод. Пожалуйста, выберите 1 или 2: ");
+                Console.Write($"{Spaces(2)}Неверный ввод. Пожалуйста, выберите 1 или 2: ");
             }
 
             switch (userChoise)
             {
                 case "1":
-                    Console.WriteLine("             Вы выбрали: Играть\n");
+                    Console.WriteLine($"{Spaces(13)}Вы выбрали: Играть\n");
                     break;
                 case "2":
-                    Console.WriteLine("             Вы выбрали: Выйти\n");
+                    Console.WriteLine($"{Spaces(13)}Вы выбрали: Выйти\n");
                     break;
             }
 
-            var Destroyer = new Destroyer("Эсминец №1");
-            var Cruiser = new Cruiser("Крейсер №1");
+            var Destroyer = new Destroyer("Эсминец");
+            var Battleship = new Battleship("Линкор");
 
-            while (Destroyer.IsAlive() && Cruiser.IsAlive())
+            while (Destroyer.IsAlive() && Battleship.IsAlive())
             {
                 int damage = Destroyer.DealDamage();
-                Cruiser.TakeDamage(damage);
+                Battleship.TakeDamage(damage);
 
-                if (!Cruiser.IsAlive()) break;
+                if (!Battleship.IsAlive()) break;
 
-                damage = Cruiser.DealDamage();
+                damage = Battleship.DealDamage();
                 Destroyer.TakeDamage(damage);
 
                 Console.WriteLine();

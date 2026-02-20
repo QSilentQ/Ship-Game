@@ -25,7 +25,6 @@ namespace Ships.Entities.Ships
             if (chance < EvasionChance)
             {
                 Console.WriteLine($"{Name} увернулся от атаки!");
-                return;
             }
 
             CurrentHeatPoints -= damage;
@@ -40,6 +39,7 @@ namespace Ships.Entities.Ships
         public virtual int DealDamage()
         {
             Random random = new();
+            Console.Write($"{Name} наносит удар. ");
             return random.Next(20, 41);
         }
     }
