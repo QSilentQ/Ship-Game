@@ -18,6 +18,7 @@ namespace Ships
             Console.WriteLine($"{Spaces(16)}2. Выйти\n");
 
             Console.Write($"{Spaces(12)}Выберите действие: ");
+
             while (true)
             {
                 userChoise = Console.ReadLine()?.Trim();
@@ -36,23 +37,53 @@ namespace Ships
                     break;
             }
 
-            var Destroyer = new Destroyer("Эсминец");
-            var Battleship = new Battleship("Линкор");
+            var firstSquad = new Squadron("Первая эскадрилия (А)");
+            var secondSquad = new Squadron("Вторая эскадрилия (Б)");
 
-            while (Destroyer.IsAlive() && Battleship.IsAlive())
+            firstSquad.AddShip(new Destroyer("Эсминец А"));
+            firstSquad.AddShip(new Cruiser("Крейсер А"));
+            firstSquad.AddShip(new Battleship("Линкор А"));
+
+            secondSquad.AddShip(new Destroyer("Эсминец Б"));
+            secondSquad.AddShip(new Cruiser("Крейсер Б"));
+            secondSquad.AddShip(new Battleship("Линкор Б"));
+
+            while (firstSquad.IsAlive() && secondSquad.IsAlive())
             {
-                int damage = Destroyer.DealDamage();
-                Battleship.TakeDamage(damage);
+                foreach (var fqShip in firstSquad.Ships)
+                {
+                    if (!firstSquad.IsAlive()) continue;
 
-                if (!Battleship.IsAlive()) break;
+                    var targets = secondSquad.Ships.FindAll(ship => ship.IsAlive());
+                    if (targets.Count == 0) break;
 
-                damage = Battleship.DealDamage();
-                Destroyer.TakeDamage(damage);
+                    var target = targets[new Random().Next(targets.Count)];
+                    int damage = fqShip.DealDamage();
+                    target.TakeDamage(damage);
+                }
+
+                if (!secondSquad.IsAlive()) break;
+
+                foreach (var sqShip in secondSquad.Ships)
+                {
+                    if (!secondSquad.IsAlive()) continue;
+
+                    var targets = firstSquad.Ships.FindAll(ship => ship.IsAlive());
+                    if (targets.Count == 0) break;
+
+                    var target = targets[new Random().Next(targets.Count)];
+                    int damage = sqShip.DealDamage();
+                    target.TakeDamage(damage);
+                }
 
                 Console.WriteLine();
             }
 
-            Console.WriteLine("Бой закончен!");
+            Console.WriteLine("Бой закончился!");
+
+            
+            string answer = firstSquad.IsAlive() ? "Первая команда победила" : "Вторая команда победила";
+            Console.WriteLine(answer);
         }
 
         static string Spaces(int count)

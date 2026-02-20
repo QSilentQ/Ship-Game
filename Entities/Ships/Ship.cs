@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Ships.Entities.Armors;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -11,6 +12,7 @@ namespace Ships.Entities.Ships
         public int MaxHeatPoints { get; } = heatPoints;
         public int CurrentHeatPoints { get; protected set; } = heatPoints;
         public int EvasionChance { get; } = evasionChance;
+        public Armor? Armor {  get; set; }
 
         public bool IsAlive()
         {
