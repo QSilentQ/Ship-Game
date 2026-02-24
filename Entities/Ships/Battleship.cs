@@ -9,21 +9,38 @@ namespace Ships.Entities.Ships
     {
         public override void TakeDamage(int damage, Ammunition? ammo)
         {
-            Random random = new();
-            if (random.Next(100) < 20 && MySquadron != null)
+            if (ammo is Torpedoes)
             {
-                Console.WriteLine($"Рикошет! {Name} не получил урона!");
+                base.TakeDamage(damage, ammo);
+                return;
+            }
 
-                var otherAllies = MySquadron.Ships.Where(s => s.IsAlive() && s != this).ToList();
-
-                if (otherAllies.Count > 0 )
+            Random random = new();
+            if (random.Next(100) < 20)
+            {
+                if (MySquadron != null)
                 {
-                    var target = otherAllies[random.Next(otherAllies.Count)];
-                    Console.WriteLine($"Снаряд отскочил прямо в союзный {target.Name}!");
-                    target.TakeDamage(damage, ammo);
-                    return;
+                    var otherAllies = MySquadron.Ships
+                        .Where(s => s.IsAlive() && s != this)
+                        .ToList();
+
+                    if (otherAllies.Count > 0)
+                    {
+                        var target = otherAllies[random.Next(otherAllies.Count)];
+                        Console.WriteLine($"Рикошет! Броня {Name} не пробита.");
+                        Console.WriteLine($"Снаряд попал в союзный {target.Name} на {damage} урона!");
+
+                        target.TakeDamage(damage, ammo);
+                    }
+                    else
+                    {
+                        Console.WriteLine($"\n Рикошет! Но рядом никого нет.");
+                        return;
+                    }
                 }
             }
+
+            // Если рикошет не случился
             base.TakeDamage(damage, ammo);
         }
     }
