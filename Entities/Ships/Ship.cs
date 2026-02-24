@@ -1,4 +1,5 @@
 ﻿using Ships.Entities.Armors;
+using Ships.Entities.Squadrons;
 using Ships.Entities.Weapons;
 using Ships.Entities.Weapons.Ammunitions;
 using System;
@@ -16,6 +17,7 @@ namespace Ships.Entities.Ships
         public int EvasionChance { get; } = evasionChance;
         public Armor? Armor {  get; set; }
         public Weapon? Weapon { get; set; }
+        public Squadron? MySquadron { get; set; }
 
         private readonly List<(int damage, Ammunition ammo)> delayedAttacks = [];
 
