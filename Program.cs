@@ -1,5 +1,9 @@
-﻿using Ships.Entities.Ships;
+﻿using Ships.Entities.Armors;
+using Ships.Entities.Ships;
 using Ships.Entities.Squadrons;
+using Ships.Entities.Weapons;
+using Ships.Entities.Weapons.Ammunitions;
+using Ships.Services;
 
 namespace Ships
 {
@@ -9,7 +13,6 @@ namespace Ships
         {
             string? userChoise;
 
-            // Это главный файл для запуска игры
             Console.WriteLine($"{Spaces(10)}Добро пожаловать в игру!");
             Console.WriteLine($"{Spaces(15)}Морские войны\n");
             Console.WriteLine($"{Spaces(19)}Меню\n");
@@ -31,59 +34,80 @@ namespace Ships
             {
                 case "1":
                     Console.WriteLine($"{Spaces(13)}Вы выбрали: Играть\n");
-                    break;
+                    break;  
                 case "2":
                     Console.WriteLine($"{Spaces(13)}Вы выбрали: Выйти\n");
                     break;
             }
 
-            var firstSquad = new Squadron("Первая эскадрилия (А)");
-            var secondSquad = new Squadron("Вторая эскадрилия (Б)");
+            Squadron firstSquadron = new("Первая команда");
+            Squadron secondSquadron = new("Вторая команда");
 
-            firstSquad.AddShip(new Destroyer("Эсминец А"));
-            firstSquad.AddShip(new Cruiser("Крейсер А"));
-            firstSquad.AddShip(new Battleship("Линкор А"));
+            FillSquadron(firstSquadron, 3);
+            Console.WriteLine();
+            FillSquadron(secondSquadron, 3);
 
-            secondSquad.AddShip(new Destroyer("Эсминец Б"));
-            secondSquad.AddShip(new Cruiser("Крейсер Б"));
-            secondSquad.AddShip(new Battleship("Линкор Б"));
+            Console.WriteLine($"\nБОЙ НАЧИНАЕТСЯ: {firstSquadron.Name} vs {secondSquadron.Name}!");
+            Console.WriteLine("Нажмите любую кнопку, чтобы начать игру...");
+            Console.ReadKey();
 
-            while (firstSquad.IsAlive() && secondSquad.IsAlive())
+            int round = 1;
+
+            while (firstSquadron.IsAlive() && secondSquadron.IsAlive())
             {
-                foreach (var fqShip in firstSquad.Ships)
-                {
-                    if (!firstSquad.IsAlive()) continue;
+                Console.WriteLine($"\n--- РАУНД {round} ---\n");
 
-                    var targets = secondSquad.Ships.FindAll(ship => ship.IsAlive());
-                    if (targets.Count == 0) break;
+                foreach (var ship in firstSquadron.Ships) ship.ProcessDelayedAttacks();
+                foreach (var ship in secondSquadron.Ships) ship.ProcessDelayedAttacks();
 
-                    var target = targets[new Random().Next(targets.Count)];
-                    int damage = fqShip.DealDamage();
-                    target.TakeDamage(damage);
-                }
+                if (!firstSquadron.IsAlive() || !secondSquadron.IsAlive()) break;
 
-                if (!secondSquad.IsAlive()) break;
+                Console.WriteLine($"\n--- Ход эскадры: {firstSquadron.Name} ---\n");
+                firstSquadron.Attack([secondSquadron]);
 
-                foreach (var sqShip in secondSquad.Ships)
-                {
-                    if (!secondSquad.IsAlive()) continue;
+                if (!secondSquadron.IsAlive()) break;
 
-                    var targets = firstSquad.Ships.FindAll(ship => ship.IsAlive());
-                    if (targets.Count == 0) break;
+                Console.WriteLine($"\n--- Ход эскадры: {secondSquadron.Name} ---\n");
+                secondSquadron.Attack([firstSquadron]);
 
-                    var target = targets[new Random().Next(targets.Count)];
-                    int damage = sqShip.DealDamage();
-                    target.TakeDamage(damage);
-                }
+                UpdateCooldowns(firstSquadron);
+                UpdateCooldowns(secondSquadron);
 
-                Console.WriteLine();
+                round++;
+                Console.WriteLine("\nКонец раунда. Нажмите любую кнопку...");
+                Console.ReadKey();
             }
 
-            Console.WriteLine("Бой закончился!");
+            Console.WriteLine("\n--- КОНЕЦ БОЯ ---");
+            if (firstSquadron.IsAlive()) Console.WriteLine($"Победу одержала {firstSquadron.Name}");
+            else if (secondSquadron.IsAlive()) Console.WriteLine($"Победу одержала {secondSquadron.Name}");
+            else Console.WriteLine("НИЧЬЯ! ВСЕ КОРАБЛИ УНИЧТОЖЕНЫ");
+        }
 
-            
-            string answer = firstSquad.IsAlive() ? "Первая команда победила" : "Вторая команда победила";
-            Console.WriteLine(answer);
+        static void FillSquadron(Squadron squadron, int count)
+        {
+            Random random = new();
+            for (int i = 0; i < count; i++)
+            {
+                Ship ship = random.Next(3) switch
+                {
+                    0 => new Destroyer($"{squadron.Name}: Эсминец #{i+1}"),
+                    1 => new Cruiser($"{squadron.Name}: Крейсер #{i + 1}"),
+                    _ => new Battleship($"{squadron.Name}: Линкор #{i + 1}")
+                };
+
+                ship.Armor = Warehouse.GetRandomArmor();
+                ship.Weapon = Warehouse.GetRandomWeapon(ship);
+                ship.Weapon.LoadedAmmo = Warehouse.GetRandomAmmo(ship.Weapon);
+
+                squadron.AddShip(ship);
+                Console.WriteLine($"+ {ship.Name} добавлен в отряд. Орудие: {ship.Weapon.Name}, Снаряды: {ship.Weapon.LoadedAmmo.Name}.");
+            }
+        }
+
+        static void UpdateCooldowns(Squadron squadron)
+        {
+            foreach (var ship in squadron.Ships) ship.Weapon?.ReduceCoolDown();
         }
 
         static string Spaces(int count)

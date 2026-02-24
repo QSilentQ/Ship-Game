@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Ships.Entities.Weapons.Ammunitions;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -10,10 +11,9 @@ namespace Ships.Entities.Armors
         public string Name { get; set; } = name;
         public int ProtectionPercent { get; set; } = protectionPercent;
 
-        public virtual int ReduceDamage(int damage)
+        public virtual int ReduceDamage(int damage, Ammunition? ammo)
         {
-            int reducedDamage = damage - (damage * ProtectionPercent / 100);
-            return reducedDamage;
+            return damage - (damage * ProtectionPercent / 100);
         }
     }
 }

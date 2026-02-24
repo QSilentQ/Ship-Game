@@ -1,4 +1,6 @@
 ﻿using Ships.Entities.Armors;
+using Ships.Entities.Weapons;
+using Ships.Entities.Weapons.Ammunitions;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -13,20 +15,58 @@ namespace Ships.Entities.Ships
         public int CurrentHeatPoints { get; protected set; } = heatPoints;
         public int EvasionChance { get; } = evasionChance;
         public Armor? Armor {  get; set; }
+        public Weapon? Weapon { get; set; }
+
+        private readonly List<(int damage, Ammunition ammo)> delayedAttacks = [];
+
+        public void AddDelayedAttack(int damage, Ammunition ammo)
+        {
+            delayedAttacks.Add((damage, ammo));
+            Console.WriteLine($"Торпеда выпущена в {Name}! Она достигнет цели в следующем ходу.");
+        }
+
+        public void ProcessDelayedAttacks()
+        {
+            if (delayedAttacks.Count == 0) return;
+            Console.WriteLine($"\nТорпеды достигли {Name}!");
+
+            var attacksToProcess = delayedAttacks.ToList();
+            delayedAttacks.Clear();
+
+            foreach ( var (damage, ammo) in attacksToProcess )
+            {
+                TakeDamage(damage, ammo);
+            }
+        }
 
         public bool IsAlive()
         {
             return CurrentHeatPoints > 0;
         }
 
-        public virtual void TakeDamage(int damage)
+        public virtual void TakeDamage(int damage, Ammunition? ammo)
         {
-            Random random = new();
-            int chance = random.Next(100);
-
-            if (chance < EvasionChance)
+            if (new Random().Next(100) < EvasionChance)
             {
-                Console.WriteLine($"{Name} увернулся от атаки!");
+                Console.WriteLine($"{Name} уклонился!");
+                return;
+            }
+
+            if (Armor != null)
+            {
+                if (ammo is HighExplosive && Armor is CasemateArmor)
+                {
+                    damage = (int)(damage * 1.5);
+                    Console.WriteLine("Попадание фугасом по казематной броне! (+50% урона)");
+                }
+
+                damage = Armor.ReduceDamage(damage, ammo);
+            }
+
+            if (ammo is Torpedoes)
+            {
+                Console.WriteLine("Торпеда пробила броню! (Двойной урон)");
+                damage *= 2;
             }
 
             CurrentHeatPoints -= damage;
@@ -34,15 +74,40 @@ namespace Ships.Entities.Ships
             {
                 CurrentHeatPoints = 0;
             }
-
             Console.WriteLine($"{Name} получил {damage} урона. HP: {CurrentHeatPoints}/{MaxHeatPoints}");
         }
 
-        public virtual int DealDamage()
+        public virtual void DealDamage(Ship target)
         {
-            Random random = new();
-            Console.Write($"{Name} наносит удар. ");
-            return random.Next(20, 41);
+            if (Weapon == null) return;
+
+            if (Weapon.IsCooldown())
+            {
+                Console.WriteLine($"{Name} на перезарядке...");
+                return;
+            }
+
+            var (damage, ammo) = Weapon.Shoot();
+
+            if (damage > 0)
+            {
+                if (ammo is Torpedoes)
+                {
+                    Console.Write($"{Name} стреляет. ");
+                    target.AddDelayedAttack(damage, ammo);
+                }
+                else
+                {
+                    Console.WriteLine($"{Name} стреляет по {target.Name}!");
+                    target.TakeDamage(damage, ammo);
+                }
+            }
+        }
+
+        public virtual bool CanEquipWeapon(Weapon weapon)
+        {
+            if (weapon is TorpedoDevices) return false;
+            return true;
         }
     }
 }

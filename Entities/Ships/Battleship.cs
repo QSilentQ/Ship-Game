@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Ships.Entities.Weapons.Ammunitions;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -6,7 +7,7 @@ namespace Ships.Entities.Ships
 {
     public class Battleship(string name) : Ship(name, 820, 0)
     {
-        public override void TakeDamage(int damage)
+        public override void TakeDamage(int damage, Ammunition? ammo)
         {
             Random random = new();
             int chance = random.Next(100);
@@ -17,7 +18,7 @@ namespace Ships.Entities.Ships
                 return;
             }
 
-            base.TakeDamage(damage);
+            base.TakeDamage(damage, ammo);
         }
     }
 }
