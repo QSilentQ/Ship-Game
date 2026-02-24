@@ -39,9 +39,22 @@ namespace Ships
             {
                 Console.WriteLine($"{Spaces(13)}Вы выбрали: Играть\n");
 
-                Console.WriteLine("Для начала введите количество команд\n");
-                if (!int.TryParse(Console.ReadLine(), out int squadronCount)) squadronCount = 2;
-                squadronCount = Math.Clamp(squadronCount, 2, 10);
+                int squadronCount;
+                Console.Write("Введите количество эскадр (от 2 до 10): ");
+
+                while (true)
+                {
+                    string? input = Console.ReadLine();
+
+                    if (int.TryParse(input, out squadronCount) && squadronCount >= 2 && squadronCount <= 10)
+                    {
+                        break;
+                    }
+
+                    Console.Write("Ошибка! Пожалуйста, введите целое число от 2 до 10: ");
+                }
+
+                Console.WriteLine($"Создано эскадр: {squadronCount}");
                 Console.WriteLine();
 
                 Console.WriteLine("\nВыберите тактику для всех команд\n");
@@ -50,7 +63,23 @@ namespace Ships
                 Console.WriteLine("3. Добивание");
                 Console.WriteLine("4. Концентрация");
                 Console.WriteLine("5. По приоритету типов\n");
-                if (!int.TryParse(Console.ReadLine(), out int tacticId)) tacticId = 4;
+                Console.Write("\nВаш выбор (от 1 до 5): ");
+
+                int tacticId;
+
+                while (true)
+                {
+                    string? input = Console.ReadLine();
+
+                    if (int.TryParse(input, out tacticId) && tacticId >= 1 && tacticId <= 5)
+                    {
+                        break;
+                    }
+
+                    Console.Write("Неверный выбор. Пожалуйста, введите число от 1 до 5: ");
+                }
+
+                Console.WriteLine($"Выбрана тактика #{tacticId}");
 
                 List<Squadron> allSquadrons = [];
 
@@ -75,17 +104,22 @@ namespace Ships
                 {
                     Console.WriteLine($"\n--- Раунд {round} начался ---\n");
 
-                    foreach (var currentSquadron in allSquadrons.Where(s => s.IsAlive()))
+                    foreach (var squadron in allSquadrons)
                     {
-                        foreach (var ship in currentSquadron.Ships)
+                        foreach (var ship in squadron.Ships)
                         {
                             ship.ProcessDelayedAttacks();
                         }
+                    }
 
-                        if (allSquadrons.Count(ship => ship.IsAlive()) <= 1) break;
+                    if (allSquadrons.Count(sq => sq.IsAlive()) <= 1) break;
 
-                        Console.WriteLine($"\n Очередь команды {currentSquadron.Name}.\n");
+                    foreach (var currentSquadron in allSquadrons.Where(s => s.IsAlive()))
+                    {
+                        Console.WriteLine($"\nХод эскадры: {currentSquadron.Name}");
                         currentSquadron.Attack(allSquadrons, tacticId);
+
+                        if (allSquadrons.Count(sq => sq.IsAlive()) <= 1) break;
                     }
 
                     foreach (var ship in allSquadrons.SelectMany(ship => ship.Ships))
@@ -93,14 +127,14 @@ namespace Ships
                         ship.Weapon?.ReduceCoolDown();
                     }
 
-                    round++;
-                    Console.WriteLine($"--- Раунд {round} закончился ---");
-                    Console.WriteLine("Нажмите любую кнопку чтобы продолжить...\n");
+                    Console.WriteLine($"\n--- Раунд {round} закончился ---");
+                    Console.WriteLine("Нажмите любую кнопку, чтобы продолжить...\n");
                     Console.ReadKey();
+                    round++;
                 }
 
                 var winner = allSquadrons.FirstOrDefault(squadron => squadron.IsAlive());
-                Console.WriteLine("\n\n------------------------------------------------");
+                Console.WriteLine("\n------------------------------------------------");
                 if (winner != null)
                 {
                     Console.WriteLine($"Победу одержала команда: {winner.Name}!");
