@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Ships.Entities.Armors
 {
-    public class ArmorBelt() : Armor("Броневой пояс по ватерлинии", 30)
+    public class ArmorBelt() : Armor("Броневой пояс по ватерлинии", 30, 100)
     {
     }
 }

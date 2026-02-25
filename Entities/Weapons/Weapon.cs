@@ -6,12 +6,13 @@ using System.Text;
 namespace Ships.Entities.Weapons
 {
     // Это класс для орудия
-    public class Weapon(string name, int minDamage, int maxDamage, int cooldown)
+    public class Weapon(string name, int minDamage, int maxDamage, int cooldown, double weight)
     {
         public string Name { get; } = name;
         public int MinDamage { get; } = minDamage;
         public int MaxDamage { get; } = maxDamage;
         public int Cooldown { get; } = cooldown;
+        public double Weight { get; } = weight;
 
         public int CurrentCooldown = 0;
 

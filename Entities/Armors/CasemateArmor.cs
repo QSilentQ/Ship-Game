@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Ships.Entities.Armors
 {
-    public class CasemateArmor() : Armor("Казематовая броня", 25)
+    public class CasemateArmor() : Armor("Казематовая броня", 25, 80)
     {
     }
 }

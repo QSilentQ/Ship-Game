@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Ships.Entities.Armors
 {
-    public class AntiTorpedoArmor() : Armor("Противоторпедная броня", 15)
+    public class AntiTorpedoArmor() : Armor("Противоторпедная броня", 15, 120)
     {
         public override int ReduceDamage(int damage, Ammunition? ammo)
         {

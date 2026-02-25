@@ -4,6 +4,7 @@ using Ships.Entities.Weapons;
 using Ships.Entities.Weapons.Ammunitions;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace Ships.Services
@@ -11,6 +12,10 @@ namespace Ships.Services
     public static class Warehouse
     {
         private static readonly Random random = new();
+
+        private static List<Armor> Armors = [];
+        private static List<Weapon> Weapons = [];
+        private static List<Ammunition> Ammunitions = [];
 
         public static Armor GetRandomArmor()
         {

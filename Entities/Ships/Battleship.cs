@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Ships.Entities.Ships
 {
-    public class Battleship(string name) : Ship(name, 820, 0)
+    public class Battleship(string name) : Ship(name, 820, 0, 700)
     {
         public override void TakeDamage(int damage, Ammunition? ammo)
         {

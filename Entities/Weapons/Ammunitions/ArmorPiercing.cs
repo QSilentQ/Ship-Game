@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Ships.Entities.Weapons.Ammunitions
 {
-    internal class ArmorPiercing() : Ammunition("Бронебойные", 25)
+    internal class ArmorPiercing() : Ammunition("Бронебойные", 25, 1.5)
     {
     }
 }

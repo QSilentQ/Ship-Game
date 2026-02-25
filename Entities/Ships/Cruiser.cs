@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Ships.Entities.Ships
 {
-    public class Cruiser(string name) : Ship(name, 580, 7)
+    public class Cruiser(string name) : Ship(name, 580, 7, 500)
     {
         public override bool CanEquipWeapon(Weapon weapon) => true;
     }

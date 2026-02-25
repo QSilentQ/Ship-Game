@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Ships.Entities.Weapons.Ammunitions
 {
-    internal class HighExplosive() : Ammunition("Фугасные", 15)
+    internal class HighExplosive() : Ammunition("Фугасные", 15, 1.5)
     {
         public override int ModifyDamage(int baseDamage)
         {

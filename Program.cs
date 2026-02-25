@@ -89,7 +89,7 @@ namespace Ships
                     string? name = Console.ReadLine();
                     if (string.IsNullOrWhiteSpace(name)) name = $"Флот-{i + 1}";
 
-                    Squadron squadron = new Squadron(name);
+                    Squadron squadron = new(name);
 
                     FillSquadronRandomly(squadron, 3);
                     allSquadrons.Add(squadron);
@@ -116,7 +116,7 @@ namespace Ships
 
                     foreach (var currentSquadron in allSquadrons.Where(s => s.IsAlive()))
                     {
-                        Console.WriteLine($"\nХод эскадры: {currentSquadron.Name}");
+                        Console.WriteLine($"\nХод эскадры: {currentSquadron.Name}\n");
                         currentSquadron.Attack(allSquadrons, tacticId);
 
                         if (allSquadrons.Count(sq => sq.IsAlive()) <= 1) break;

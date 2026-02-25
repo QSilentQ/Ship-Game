@@ -9,18 +9,18 @@ using System.Text;
 namespace Ships.Entities.Ships
 {
     // Это класс для кораблей
-    public class Ship(string name, int heatPoints, int evasionChance)
+    public class Ship(string name, int heatPoints, int evasionChance, double allowableWeight)
     {
         public string Name { get; } = name;
         public int MaxHeatPoints { get; } = heatPoints;
         public int CurrentHeatPoints { get; protected set; } = heatPoints;
         public int EvasionChance { get; } = evasionChance;
+        public double AllowableWeight { get; } = allowableWeight;
         public Armor? Armor {  get; set; }
         public Weapon? Weapon { get; set; }
         public Squadron? MySquadron { get; set; }
 
         private readonly List<(int damage, Ammunition ammo)> delayedAttacks = [];
-
         public void AddDelayedAttack(int damage, Ammunition ammo)
         {
             delayedAttacks.Add((damage, ammo));
