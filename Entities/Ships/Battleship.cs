@@ -26,7 +26,7 @@ namespace Ships.Entities.Ships
 
                     if (otherAllies.Count > 0)
                     {
-                        var target = otherAllies[random.Next(otherAllies.Count)];
+                        Ship target = otherAllies[random.Next(otherAllies.Count)];
                         Console.WriteLine($"Рикошет! Броня {Name} не пробита.");
                         Console.WriteLine($"Снаряд попал в союзный {target.Name} на {damage} урона!");
 

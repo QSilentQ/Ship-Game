@@ -5,12 +5,13 @@ using Ships.Entities.Weapons;
 using Ships.Entities.Weapons.Ammunitions;
 using Ships.Services;
 using System.Formats.Asn1;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Ships
 {
     internal class ShipGame
     {
-        static void Main(string[] args)
+        static void Main()
         {
             string? userChoise;
 
@@ -104,9 +105,9 @@ namespace Ships
                 {
                     Console.WriteLine($"\n--- Раунд {round} начался ---\n");
 
-                    foreach (var squadron in allSquadrons)
+                    foreach (Squadron squadron in allSquadrons)
                     {
-                        foreach (var ship in squadron.Ships)
+                        foreach (Ship ship in squadron.Ships)
                         {
                             ship.ProcessDelayedAttacks();
                         }
@@ -114,7 +115,7 @@ namespace Ships
 
                     if (allSquadrons.Count(sq => sq.IsAlive()) <= 1) break;
 
-                    foreach (var currentSquadron in allSquadrons.Where(s => s.IsAlive()))
+                    foreach (Squadron currentSquadron in allSquadrons.Where(s => s.IsAlive()))
                     {
                         Console.WriteLine($"\nХод эскадры: {currentSquadron.Name}\n");
                         currentSquadron.Attack(allSquadrons, tacticId);
@@ -122,13 +123,15 @@ namespace Ships
                         if (allSquadrons.Count(sq => sq.IsAlive()) <= 1) break;
                     }
 
-                    foreach (var ship in allSquadrons.SelectMany(ship => ship.Ships))
+                    Console.WriteLine($"\n--- Раунд {round} закончился ---\n");
+
+                    foreach (Ship ship in allSquadrons.SelectMany(ship => ship.Ships))
                     {
+                        ship.ApplyRoundDamage();
                         ship.Weapon?.ReduceCoolDown();
                     }
 
-                    Console.WriteLine($"\n--- Раунд {round} закончился ---");
-                    Console.WriteLine("Нажмите любую кнопку, чтобы продолжить...\n");
+                    Console.WriteLine("\nНажмите любую кнопку, чтобы продолжить...\n");
                     Console.ReadKey();
                     round++;
                 }

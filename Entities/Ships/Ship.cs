@@ -20,7 +20,27 @@ namespace Ships.Entities.Ships
         public Weapon? Weapon { get; set; }
         public Squadron? MySquadron { get; set; }
 
+        private readonly List<(int damage, Ammunition ammo)> currentRoundHits = [];
+
         private readonly List<(int damage, Ammunition ammo)> delayedAttacks = [];
+
+        public void RegisterHit(int damage, Ammunition ammo)
+        {
+            currentRoundHits.Add((damage, ammo));
+            Console.WriteLine($"В {Name} летит {ammo.Name}");
+        }
+
+        public void ApplyRoundDamage()
+        {
+            if (currentRoundHits.Count == 0) return;
+
+            foreach (var (damage, ammo) in currentRoundHits)
+            {
+                TakeDamage(damage, ammo);
+            }
+            currentRoundHits.Clear();
+        }
+
         public void AddDelayedAttack(int damage, Ammunition ammo)
         {
             delayedAttacks.Add((damage, ammo));
@@ -101,7 +121,7 @@ namespace Ships.Entities.Ships
                 else
                 {
                     Console.WriteLine($"{Name} стреляет по {target.Name}!");
-                    target.TakeDamage(damage, ammo);
+                    target.RegisterHit(damage, ammo);
                 }
             }
         }
