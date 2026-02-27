@@ -1,4 +1,5 @@
 ﻿using Ships.Entities.Armors;
+using Ships.Entities.Inventories;
 using Ships.Entities.Squadrons;
 using Ships.Entities.Weapons;
 using Ships.Entities.Weapons.Ammunitions;
@@ -16,18 +17,17 @@ namespace Ships.Entities.Ships
         public int CurrentHeatPoints { get; protected set; } = heatPoints;
         public int EvasionChance { get; } = evasionChance;
         public double AllowableWeight { get; } = allowableWeight;
-        public Armor? Armor {  get; set; }
-        public Weapon? Weapon { get; set; }
+
+        public Inventory Inventory { get; set; } = new(allowableWeight);
         public Squadron? MySquadron { get; set; }
 
         private readonly List<(int damage, Ammunition ammo)> currentRoundHits = [];
-
         private readonly List<(int damage, Ammunition ammo)> delayedAttacks = [];
 
-        public void RegisterHit(int damage, Ammunition ammo)
+        public void RegisterHit(int damage, Ammunition loadedAmmo)
         {
-            currentRoundHits.Add((damage, ammo));
-            Console.WriteLine($"В {Name} летит {ammo.Name}");
+            currentRoundHits.Add((damage, loadedAmmo));
+            Console.WriteLine($"В {Name} летит {loadedAmmo.Name}");
         }
 
         public void ApplyRoundDamage()
@@ -66,7 +66,7 @@ namespace Ships.Entities.Ships
             return CurrentHeatPoints > 0;
         }
 
-        public virtual void TakeDamage(int damage, Ammunition? ammo)
+        public virtual void TakeDamage(int damage, Ammunition ammo)
         {
             if (new Random().Next(100) < EvasionChance)
             {
@@ -74,15 +74,15 @@ namespace Ships.Entities.Ships
                 return;
             }
 
-            if (Armor != null)
+            if (Inventory.Armor != null)
             {
-                if (ammo is HighExplosive && Armor is CasemateArmor)
+                if (ammo is HighExplosive && Inventory.Armor is CasemateArmor)
                 {
                     damage = (int)(damage * 1.5);
                     Console.WriteLine("Попадание фугасом по казематной броне! (+50% урона)");
                 }
 
-                damage = Armor.ReduceDamage(damage, ammo);
+                damage = Inventory.Armor.ReduceDamage(damage, ammo);
             }
 
             if (ammo is Torpedoes)
@@ -101,27 +101,31 @@ namespace Ships.Entities.Ships
 
         public virtual void DealDamage(Ship target)
         {
-            if (Weapon == null) return;
+            if (Inventory.Weapon == null) return;
 
-            if (Weapon.IsCooldown())
+            if (Inventory.Weapon.IsCooldown())
             {
                 Console.WriteLine($"{Name} на перезарядке...");
                 return;
             }
 
-            var (damage, ammo) = Weapon.Shoot();
+            Ammunition? ammo = Inventory.GetAmmunition();
+            if (ammo == null) return;
+
+            var (damage, loadedAmmo) = Inventory.Weapon.Shoot(ammo);
+            if (loadedAmmo == null) return;
 
             if (damage > 0)
             {
-                if (ammo is Torpedoes)
+                if (loadedAmmo is Torpedoes)
                 {
                     Console.Write($"{Name} стреляет. ");
-                    target.AddDelayedAttack(damage, ammo);
+                    target.AddDelayedAttack(damage, loadedAmmo);
                 }
                 else
                 {
                     Console.WriteLine($"{Name} стреляет по {target.Name}!");
-                    target.RegisterHit(damage, ammo);
+                    target.RegisterHit(damage, loadedAmmo);
                 }
             }
         }

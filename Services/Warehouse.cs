@@ -1,4 +1,5 @@
 ﻿using Ships.Entities.Armors;
+using Ships.Entities.Inventories;
 using Ships.Entities.Ships;
 using Ships.Entities.Weapons;
 using Ships.Entities.Weapons.Ammunitions;
@@ -12,10 +13,6 @@ namespace Ships.Services
     public static class Warehouse
     {
         private static readonly Random random = new();
-
-        private static List<Armor> Armors = [];
-        private static List<Weapon> Weapons = [];
-        private static List<Ammunition> Ammunitions = [];
 
         public static Armor GetRandomArmor()
         {
@@ -45,8 +42,10 @@ namespace Ships.Services
             }
         }
 
-        public static Ammunition GetRandomAmmo(Weapon weapon)
+        public static Ammunition? GetRandomAmmo(Weapon? weapon)
         {
+            if (weapon == null) return null;
+
             while (true)
             {
                 Ammunition ammo = random.Next(3) switch

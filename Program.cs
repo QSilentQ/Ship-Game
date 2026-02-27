@@ -1,4 +1,5 @@
 ﻿using Ships.Entities.Armors;
+using Ships.Entities.Inventories;
 using Ships.Entities.Ships;
 using Ships.Entities.Squadrons;
 using Ships.Entities.Weapons;
@@ -128,7 +129,7 @@ namespace Ships
                     foreach (Ship ship in allSquadrons.SelectMany(ship => ship.Ships))
                     {
                         ship.ApplyRoundDamage();
-                        ship.Weapon?.ReduceCoolDown();
+                        ship.Inventory.Weapon?.ReduceCoolDown();
                     }
 
                     Console.WriteLine("\nНажмите любую кнопку, чтобы продолжить...\n");
@@ -161,12 +162,13 @@ namespace Ships
                         _ => new Battleship($"Линкор '{squadron.Name} #{i + 1}'")
                     };
 
-                    ship.Armor = Warehouse.GetRandomArmor();
-                    ship.Weapon = Warehouse.GetRandomWeapon(ship);
-                    ship.Weapon.LoadedAmmo = Warehouse.GetRandomAmmo(ship.Weapon);
+                    ship.Inventory = new Inventory(ship.AllowableWeight);
+                    ship.Inventory.TryAdd(Warehouse.GetRandomArmor());
+                    ship.Inventory.TryAdd(Warehouse.GetRandomWeapon(ship));
+                    ship.Inventory.TryAdd(Warehouse.GetRandomAmmo(ship.Inventory.Weapon));
 
                     squadron.AddShip(ship);
-                    Console.WriteLine($"+ Создан {ship.Name} (Орудие: {ship.Weapon.Name}, Снаряды: {ship.Weapon.LoadedAmmo.Name})");
+                    Console.WriteLine($"+ Создан {ship.Name} (Орудие: {ship.Inventory?.Weapon?.Name})");
                 }
             }
 

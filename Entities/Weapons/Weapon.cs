@@ -1,4 +1,5 @@
-﻿using Ships.Entities.Weapons.Ammunitions;
+﻿using Ships.Entities.Items;
+using Ships.Entities.Weapons.Ammunitions;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -6,13 +7,11 @@ using System.Text;
 namespace Ships.Entities.Weapons
 {
     // Это класс для орудия
-    public class Weapon(string name, int minDamage, int maxDamage, int cooldown, double weight)
+    public class Weapon(string name, int minDamage, int maxDamage, int cooldown, double weight) : Item(name, ItemType.Weapon, weight)
     {
-        public string Name { get; } = name;
         public int MinDamage { get; } = minDamage;
         public int MaxDamage { get; } = maxDamage;
         public int Cooldown { get; } = cooldown;
-        public double Weight { get; } = weight;
 
         public int CurrentCooldown = 0;
 
@@ -29,17 +28,17 @@ namespace Ships.Entities.Weapons
             return true;
         }
 
-        public (int damage, Ammunition? ammo) Shoot()
+        public (int damage, Ammunition? ammo) Shoot(Ammunition ammo)
         {
             if (IsCooldown()) return (0, null);
 
             int baseDamage = new Random().Next(MinDamage, MaxDamage + 1);
 
-            int totalDamage = LoadedAmmo != null ? LoadedAmmo.ModifyDamage(baseDamage) : baseDamage;
+            int totalDamage = ammo != null ? ammo.ModifyDamage(baseDamage) : baseDamage;
 
             CurrentCooldown = Cooldown;
 
-            return (totalDamage, LoadedAmmo);
+            return (totalDamage, ammo);
         }
 
         public void ReduceCoolDown()

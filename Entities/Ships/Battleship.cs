@@ -9,6 +9,11 @@ namespace Ships.Entities.Ships
     {
         public override void TakeDamage(int damage, Ammunition? ammo)
         {
+            if (ammo == null)
+            {
+                return;
+            }
+
             if (ammo is Torpedoes)
             {
                 base.TakeDamage(damage, ammo);
